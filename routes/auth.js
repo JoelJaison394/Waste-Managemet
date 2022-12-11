@@ -40,6 +40,17 @@ router.post("/register", async (req,res) => {
         });
 
         const SavedUser = await newUser.save();
+        const payload = { userId: SavedUser._id };
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+          expiresIn: "7d",
+        });
+    
+        res.cookie("access-token", token, {
+          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+        });
         const usertoReturn = { ...SavedUser._doc};
         delete usertoReturn.password;
 
@@ -100,6 +111,17 @@ router.get("/current", requiresAuth, (req, res) => {
     }
   
     return res.json(req.user);
+  });
+
+  router.put("/logout", requiresAuth, async (req, res) => {
+    try {
+      res.clearCookie("access-token");
+  
+      return res.json({ success: true });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(err.message);
+    }
   });
   
 
