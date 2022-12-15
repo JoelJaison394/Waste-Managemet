@@ -305,3 +305,36 @@ textarea {
     }
   }
 }
+
+.User{
+  display: flex;
+  align-items: center;
+
+  .hero{
+    .left__section{
+      height: auto;
+      width: 50%;
+  
+      .user_field > form{
+        display: flex;
+        flex-direction: column;
+  
+        input {
+          width: 50%;
+        }
+      }
+    }
+    
+  }
+
+
+}
+
+.toComplete{
+  height: 600px;
+  width: 100%;
+}
+
+.Content_section{
+  height: 600px;
+}

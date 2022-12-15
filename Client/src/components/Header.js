@@ -15,7 +15,7 @@ const Header = () => {
 
         <div className="main-header__right">
           {user ? (
-            <button className="btn" onClick={logout}>
+            <button className="btn" onClick={function(event) {logout() ;}}>
               Logout
             </button>
           ) : pathname === "/" ? (

@@ -12,6 +12,16 @@ const validateRegisterInput = (data) =>{
         errors.email = "invalid email address";
     }
 
+    if(isEmpty(data.role)){
+        errors.role = "enter the role that suites you"
+    }
+
+    if(isEmpty(data.location)){
+        errors.location = "enter your location"
+    } else if(!Validator.isLength(data.location, {min: 3, max:150})){
+        error.location = "enter the proper location"
+    }
+
     if(isEmpty(data.password)){
         errors.password = "Password canno be empty";
     } else if(!Validator.isLength(data.password, {min: 6, max:150})){

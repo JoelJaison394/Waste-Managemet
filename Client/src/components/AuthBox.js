@@ -6,28 +6,41 @@ import { useGlobalContext } from "../context/GlobalContext";
 const AuthBox = ({ register }) => {
   const { getCurrentUser, user } = useGlobalContext();
   const navigate = useNavigate();
+  const [role,setRole]=React.useState("")
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [name, setName] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
   const [errors, setErrors] = React.useState({});
+
+
 
   React.useEffect(() => {
     if (user && navigate) {
-      navigate("/dashboard");
+      if(user.role === 'Collector'){
+        navigate("/admin");
+      }else if(user.role === 'User'){
+        navigate("/users");
+      }else {
+        navigate('/')
+      }        
     }
   }, [user, navigate]);
 
+  console.log(user);
+
+
+
+
   const onSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
 
     let data = {};
 
     if (register) {
       data = {
         name,
+        role,
         email,
         password,
         confirmPassword,
@@ -45,7 +58,6 @@ const AuthBox = ({ register }) => {
         getCurrentUser();
       })
       .catch((err) => {
-        setLoading(false);
 
         if (err?.response?.data) {
           setErrors(err.response.data);
@@ -72,6 +84,38 @@ const AuthBox = ({ register }) => {
 
               {errors.name && <p className="auth__error">{errors.name}</p>}
             </div>
+          )}
+
+          {register && (
+            <div className="auth__field">
+              <label>Role</label>
+              <input
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              />
+
+
+              {errors.name && <p className="auth__error">{errors.role}</p>}
+            </div>
+
+            
+          )}
+
+          {register && (
+            <div className="auth__field">
+              <label>Location</label>
+              <input
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              />
+
+
+              {errors.name && <p className="auth__error">{errors.location}</p>}
+            </div>
+
+            
           )}
 
           <div className="auth__field">
@@ -120,7 +164,7 @@ const AuthBox = ({ register }) => {
               </p>
             )}
 
-            <button className="btn" type="submit" disabled={loading}>
+            <button className="btn" type="submit" >
               {register ? "Register" : "Login"}
             </button>
 

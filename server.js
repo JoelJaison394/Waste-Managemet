@@ -3,8 +3,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const path =  require('path');
-const authRoute = require("./routes/auth")
-const toDosRoute = require("./routes/todos");
+
+const authRoute = require("./routes/auth");
+const userRoute = require("./routes/user");
+const adminRoute = require("./routes/admin");
 
 const app=express();
 
@@ -29,7 +31,9 @@ app.post("/name", (req,res) =>{
 })
 
 app.use("/api/auth", authRoute)
-app.use("/api/todos", toDosRoute)
+app.use("/api/user",userRoute)
+app.use("/api/admin",adminRoute)
+
 
 app.use(express.static(path.resolve(__dirname, "./client/build")));
 app.get("*", (req, res) => {

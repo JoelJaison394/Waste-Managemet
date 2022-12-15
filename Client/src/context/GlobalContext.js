@@ -1,13 +1,20 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
+
 import axios from "axios";
+
+  
+
+
 
 // initial state
 const initialState = {
   user: null,
   fetchingUser: true,
-  completeToDos: [],
-  incompleteToDos: [],
+  completeCollection: [],
+  incompleteCollection: [],
 };
+
+
 
 // reducer
 const globalReducer = (state, action) => {
@@ -18,22 +25,22 @@ const globalReducer = (state, action) => {
         user: action.payload,
         fetchingUser: false,
       };
-    case "SET_COMPLETE_TODOS":
+    case "SET_COMPLETE_COLLECTION":
       return {
         ...state,
-        completeToDos: action.payload,
+        completeCollection: action.payload,
       };
-    case "SET_INCOMPLETE_TODOS":
+    case "SET_INCOMPLETE_COLLECTION":
       return {
         ...state,
-        incompleteToDos: action.payload,
+        incompleteCollection: action.payload,
       };
     case "RESET_USER":
       return {
         ...state,
         user: null,
-        completeToDos: [],
-        incompleteToDos: [],
+        completeCollection: [],
+        incompleteCollection: [],
         fetchingUser: false,
       };
     default:
@@ -56,19 +63,23 @@ export const GlobalProvider = (props) => {
   const getCurrentUser = async () => {
     try {
       const res = await axios.get("/api/auth/current");
-
+      // console.log(res);
       if (res.data) {
-        const toDosRes = await axios.get("/api/todos/current");
+        const toComRes = await axios.get("/api/user/current");
+        console.log(toComRes)
 
-        if (toDosRes.data) {
-          dispatch({ type: "SET_USER", payload: res.data });
+        if (toComRes.data) {
           dispatch({
-            type: "SET_COMPLETE_TODOS",
-            payload: toDosRes.data.complete,
+             type: "SET_USER",
+              payload: res.data,
+            });
+          dispatch({
+            type: "SET_COMPLETE_COLLECTION",
+            payload: toComRes.data.complete,
           });
           dispatch({
-            type: "SET_INCOMPLETE_TODOS",
-            payload: toDosRes.data.incomplete,
+            type: "SET_INCOMPLETE_COLLECTION",
+            payload: toComRes.data.incomplete,
           });
         }
       } else {
@@ -81,9 +92,9 @@ export const GlobalProvider = (props) => {
   };
 
   const logout = async () => {
+
     try {
       await axios.put("/api/auth/logout");
-
       dispatch({ type: "RESET_USER" });
     } catch (err) {
       console.log(err);
@@ -91,94 +102,89 @@ export const GlobalProvider = (props) => {
     }
   };
 
-  const addToDo = (toDo) => {
-    dispatch({
-      type: "SET_INCOMPLETE_TODOS",
-      payload: [toDo, ...state.incompleteToDos],
-    });
-  };
+  // const addToDo = (toDo) => {
+  //   dispatch({
+  //     type: "SET_INCOMPLETE_TODOS",
+  //     payload: [toDo, ...state.incompleteToDos],
+  //   });
+  // };
 
-  const toDoComplete = (toDo) => {
-    dispatch({
-      type: "SET_INCOMPLETE_TODOS",
-      payload: state.incompleteToDos.filter(
-        (incompleteToDo) => incompleteToDo._id !== toDo._id
-      ),
-    });
+  // const toDoComplete = (toDo) => {
+  //   dispatch({
+  //     type: "SET_INCOMPLETE_TODOS",
+  //     payload: state.incompleteToDos.filter(
+  //       (incompleteToDo) => incompleteToDo._id !== toDo._id
+  //     ),
+  //   });
 
-    dispatch({
-      type: "SET_COMPLETE_TODOS",
-      payload: [toDo, ...state.completeToDos],
-    });
-  };
+  //   dispatch({
+  //     type: "SET_COMPLETE_TODOS",
+  //     payload: [toDo, ...state.completeToDos],
+  //   });
+  // };
 
-  const toDoIncomplete = (toDo) => {
-    dispatch({
-      type: "SET_COMPLETE_TODOS",
-      payload: state.completeToDos.filter(
-        (completeToDo) => completeToDo._id !== toDo._id
-      ),
-    });
+  // const toDoIncomplete = (toDo) => {
+  //   dispatch({
+  //     type: "SET_COMPLETE_TODOS",
+  //     payload: state.completeToDos.filter(
+  //       (completeToDo) => completeToDo._id !== toDo._id
+  //     ),
+  //   });
 
-    const newIncompleteToDos = [toDo, ...state.incompleteToDos];
+  //   const newIncompleteToDos = [toDo, ...state.incompleteToDos];
 
-    dispatch({
-      type: "SET_INCOMPLETE_TODOS",
-      payload: newIncompleteToDos.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      ),
-    });
-  };
+  //   dispatch({
+  //     type: "SET_INCOMPLETE_TODOS",
+  //     payload: newIncompleteToDos.sort(
+  //       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  //     ),
+  //   });
+  // };
 
-  const removeToDo = (toDo) => {
-    if (toDo.complete) {
-      dispatch({
-        type: "SET_COMPLETE_TODOS",
-        payload: state.completeToDos.filter(
-          (completeToDo) => completeToDo._id !== toDo._id
-        ),
-      });
-    } else {
-      dispatch({
-        type: "SET_INCOMPLETE_TODOS",
-        payload: state.incompleteToDos.filter(
-          (incompleteToDo) => incompleteToDo._id !== toDo._id
-        ),
-      });
-    }
-  };
+  // const removeToDo = (toDo) => {
+  //   if (toDo.complete) {
+  //     dispatch({
+  //       type: "SET_COMPLETE_TODOS",
+  //       payload: state.completeToDos.filter(
+  //         (completeToDo) => completeToDo._id !== toDo._id
+  //       ),
+  //     });
+  //   } else {
+  //     dispatch({
+  //       type: "SET_INCOMPLETE_TODOS",
+  //       payload: state.incompleteToDos.filter(
+  //         (incompleteToDo) => incompleteToDo._id !== toDo._id
+  //       ),
+  //     });
+  //   }
+  // };
 
-  const updateToDo = (toDo) => {
-    if (toDo.complete) {
-      const newCompleteToDos = state.completeToDos.map((completeToDo) =>
-        completeToDo._id !== toDo._id ? completeToDo : toDo
-      );
+  // const updateToDo = (toDo) => {
+  //   if (toDo.complete) {
+  //     const newCompleteToDos = state.completeToDos.map((completeToDo) =>
+  //       completeToDo._id !== toDo._id ? completeToDo : toDo
+  //     );
 
-      dispatch({
-        type: "SET_COMPLETE_TODOS",
-        payload: newCompleteToDos,
-      });
-    } else {
-      const newIncompleteToDos = state.incompleteToDos.map((incompleteToDo) =>
-        incompleteToDo._id !== toDo._id ? incompleteToDo : toDo
-      );
+  //     dispatch({
+  //       type: "SET_COMPLETE_TODOS",
+  //       payload: newCompleteToDos,
+  //     });
+  //   } else {
+  //     const newIncompleteToDos = state.incompleteToDos.map((incompleteToDo) =>
+  //       incompleteToDo._id !== toDo._id ? incompleteToDo : toDo
+  //     );
 
-      dispatch({
-        type: "SET_INCOMPLETE_TODOS",
-        payload: newIncompleteToDos,
-      });
-    }
-  };
+  //     dispatch({
+  //       type: "SET_INCOMPLETE_TODOS",
+  //       payload: newIncompleteToDos,
+  //     });
+  //   }
+  // };
 
   const value = {
     ...state,
     getCurrentUser,
     logout,
-    addToDo,
-    toDoComplete,
-    toDoIncomplete,
-    removeToDo,
-    updateToDo,
   };
 
   return (
